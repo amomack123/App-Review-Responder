@@ -1,0 +1,50 @@
+version: "1.0"
+name: App Review Responder
+summary: |
+  Pipeline that classifies an incoming review, retrieves the most relevant FAQ
+  answer via LlamaIndex, and drafts a personalized response.
+
+inputs:
+  review:
+    type: object
+    description: Review payload containing at least `text`, `author`, and `rating` fields.
+
+steps:
+  - id: classify_review
+    description: Determine whether the review is a bug, feature request, praise, or complaint.
+    inputs:
+      review_text: "{{ inputs.review.text }}"
+    outputs:
+      category: "{{ python('pipeline.classify_review', review_text=inputs.review.text) }}"
+
+  - id: retrieve_faq
+    description: Query the FAQ knowledge base with LlamaIndex using the review text.
+    inputs:
+      review_text: "{{ inputs.review.text }}"
+      category: "{{ steps.classify_review.outputs.category }}"
+    outputs:
+      faq_entry: "{{ python('retrieval.FAQRetriever().retrieve', query=inputs.review.text, category=steps.classify_review.outputs.category) }}"
+
+  - id: generate_response
+    description: Blend the FAQ answer with contextual reasoning to craft a friendly response.
+    inputs:
+      review: "{{ inputs.review }}"
+      category: "{{ steps.classify_review.outputs.category }}"
+      faq_entry: "{{ steps.retrieve_faq.outputs.faq_entry }}"
+    outputs:
+      response: "{{ python('pipeline.generate_response', review=inputs.review, category=steps.classify_review.outputs.category, faq_entry=steps.retrieve_faq.outputs.faq_entry) }}"
+
+  - id: honeyhive_scoring
+    optional: true
+    description: Call HoneyHive (mock) to score tone and helpfulness.
+    inputs:
+      review_text: "{{ inputs.review.text }}"
+      response_text: "{{ steps.generate_response.outputs.response }}"
+    outputs:
+      honeyhive_score: "{{ python('honeyhive.HoneyHiveEvaluator().score', review_text=inputs.review.text, response_text=steps.generate_response.outputs.response) }}"
+
+outputs:
+  category: "{{ steps.classify_review.outputs.category }}"
+  faq_entry: "{{ steps.retrieve_faq.outputs.faq_entry }}"
+  response: "{{ steps.generate_response.outputs.response }}"
+  honeyhive_score: "{{ steps.honeyhive_scoring.outputs.honeyhive_score }}"

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "faq_crash",
+    "category": "bug",
+    "title": "App crashes or won't open",
+    "body": "Thanks for letting us know about the crash. Our team is already investigating. If possible, please share your device model and OS version so we can reproduce the issue quickly."
+  },
+  {
+    "id": "faq_performance",
+    "category": "complaint",
+    "title": "Slow performance or lag",
+    "body": "We appreciate the heads-up about the slow down. Clearing cached data and ensuring the latest update is installed usually helps. We're monitoring performance closely and have optimizations scheduled for the next release."
+  },
+  {
+    "id": "faq_feature",
+    "category": "feature request",
+    "title": "Requesting a new feature",
+    "body": "We love hearing new ideas! The product team reviews every request. While we can't promise an ETA, your feedback directly shapes the roadmap."
+  },
+  {
+    "id": "faq_praise",
+    "category": "praise",
+    "title": "Positive feedback",
+    "body": "Thank you for sharing the love! We'll pass your kind words to the team—it means a lot and keeps us motivated to keep building great experiences."
+  },
+  {
+    "id": "faq_payment",
+    "category": "complaint",
+    "title": "Billing or subscription issue",
+    "body": "I'm sorry for the billing hiccup. Please double-check that your payment method is current. If you're still seeing unexpected charges, contact support via the in-app Help Center so we can resolve it right away."
+  },
+  {
+    "id": "faq_account",
+    "category": "bug",
+    "title": "Cannot log in",
+    "body": "We're sorry you're locked out. Resetting your password from the login screen usually does the trick. If not, email support with your registered email so we can take a closer look."
+  }
+]
