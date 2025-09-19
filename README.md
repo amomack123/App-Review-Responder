@@ -9,7 +9,7 @@ Demo application that fetches mobile app store reviews, classifies them, retriev
 - **Retrieval layer** built with LlamaIndex and a keyword fallback for environments without the dependency installed.
 - **Airia orchestration pipeline** that classifies reviews, retrieves knowledge, and generates personalized replies.
 - **Streamlit UI** showing raw reviews and generated responses side-by-side with a "Run pipeline" button.
-- **HoneyHive mock evaluator** returning deterministic tone/helpfulness scores for demo purposes.
+- **HoneyHive integration** with real tracing and metrics collection for monitoring response quality.
 
 ## Getting started
 
@@ -35,10 +35,49 @@ Demo application that fetches mobile app store reviews, classifies them, retriev
 
 The repo contains [`airia_pipeline.yaml`](./airia_pipeline.yaml), which mirrors the Python orchestration. Upload it to Airia to execute the same classification → retrieval → response → scoring flow in production.
 
+## HoneyHive Integration
+
+This app now includes full HoneyHive integration for tracing and metrics collection:
+
+### Setup
+
+1. Sign up at [honeyhive.ai](https://honeyhive.ai) and get your API key
+2. Set the environment variable:
+   ```bash
+   export HONEYHIVE_API_KEY="hh_3io6A4k9GdNakYPA0oPFmAuyMw4PwZzy"
+   ```
+
+### Features
+
+- **Automatic Tracing**: All pipeline functions (`classify_review`, `retrieve`, `generate_response`) are decorated with `@trace`
+- **Comprehensive Metrics**: Each response is evaluated for:
+  - **Correctness**: Does the response address the review's main concern?
+  - **Relevance**: Did we retrieve the right FAQ entry?
+  - **Tone**: Is the response empathetic and friendly?
+  - **Clarity**: Is the response concise and readable?
+  - **Helpfulness**: Overall quality score combining all metrics
+- **Session Management**: All traces are grouped into sessions for easy analysis
+
+### Demo Script
+
+Run the HoneyHive demo:
+
+```bash
+python demo_honeyhive.py
+```
+
+This processes sample reviews and shows the metrics calculation in action.
+
+### Viewing Results
+
+1. Check your HoneyHive dashboard after running the pipeline
+2. Look for the "App-Review-Responder" project
+3. Analyze traces, metrics, and session data
+
 ## Extending the demo
 
 - Replace the Bright Data stub with a real dataset ID once you have credentials.
 - Swap the keyword fallback with Redis A2A embeddings by implementing a new retriever in `retrieval.py`.
-- Connect HoneyHive's API in `honeyhive.py` to replace the mock evaluator.
+- Customize the metrics calculation in `honeyhive.py` for your specific use case.
 
 Happy hacking! 🚀

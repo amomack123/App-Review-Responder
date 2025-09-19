@@ -1,3 +1,4 @@
 streamlit>=1.25
 llama-index>=0.9.30
 requests>=2.31
+honeyhive

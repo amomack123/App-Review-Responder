@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-from honeyhive import HoneyHiveEvaluator, HoneyHiveScore
+from honeyhive import HoneyHiveEvaluator, HoneyHiveScore, trace, HONEYHIVE_AVAILABLE
 from retrieval import FAQRetriever
 
 
@@ -26,7 +26,9 @@ class ReviewResult:
     honeyhive_score: Optional[HoneyHiveScore] = None
 
 
+@trace
 def classify_review(review_text: str) -> str:
+    """Classify review into categories based on keywords."""
     lowered = review_text.lower()
     best_category = DEFAULT_CATEGORY
     best_score = 0
@@ -38,7 +40,9 @@ def classify_review(review_text: str) -> str:
     return best_category
 
 
+@trace
 def generate_response(review: Dict[str, str], category: str, faq_entry: Dict[str, str]) -> str:
+    """Generate a personalized response to a review based on category and FAQ entry."""
     author = review.get("author") or "there"
     rating = review.get("rating")
     review_text = review.get("text", "")
@@ -75,14 +79,16 @@ class AiriaPipeline:
         self.retriever = FAQRetriever()
         self.honeyhive = HoneyHiveEvaluator() if enable_honeyhive else None
 
+    @trace
     def run(self, review: Dict[str, str]) -> ReviewResult:
+        """Main pipeline to process a review and generate a response."""
         review_text = review.get("text", "")
         category = classify_review(review_text)
         faq_entry = self.retriever.retrieve(review_text, category=category)
         response = generate_response(review, category, faq_entry)
         honeyhive_score = None
         if self.honeyhive:
-            honeyhive_score = self.honeyhive.score(review_text, response)
+            honeyhive_score = self.honeyhive.score(review_text, response, faq_entry)
         return ReviewResult(
             review=review,
             category=category,
